@@ -1,0 +1,461 @@
+# Building Intelligent Contracts with Genlayer
+
+From Architecture to Execution to Adoption
+
+This guide walks you through how to design, build, test and ship intelligent contracts on Genlayer with examples and implementation patterns.
+
+## 1. What Makes Genlayer Different in Practice
+
+Genlayer contracts are different from contracts. Other contracts are rigid. Every outcome must be predefined.
+
+Genlayer contracts change that by letting Genlayer contracts do these things:
+
+* Interpret the intent of fixed conditions
+
+* Pull in world and off-chain data
+
+* Produce outcomes
+
+* Reach consensus on decisions
+
+In terms you are no longer coding answers. You are defining goals, constraints and letting the Genlayer system reason toward outcomes.
+
+## 2. Your First Intelligent Contract
+
+A Goal-Based Escrow
+
+Lets start with something
+
+### Problem
+
+Alice hires Bob to design a logo. Payment depends on whether the work meets expectations. This is subjective and hard to encode with logic.
+
+### Genlayer Approach
+
+We define a goal. Let validators reason about whether it was met.
+
+### Step 1: Define the Contract Structure
+
+```python
+
+class IntelligentEscrow:
+
+def __init__(self):
+
+self.goal = "Determine if delivered work meets agreed quality and scope"
+
+self.constraints = [
+
+"Work must match brief"
+
+"Delivery must be on time"
+
+"No plagiarism or reused assets"
+
+]
+
+self.state = "PENDING"
+
+self.funds_locked =
+
+```
+
+### Step 2: Accept Inputs
+
+```python
+
+def submit_work(self work_data, brief):
+
+self.work_data = work_data
+
+self.brief = brief
+
+```
+
+### Step 3: Trigger Evaluation
+
+```python
+
+def evaluate(self):
+
+decision = run_reasoning(
+
+goal=self.goal
+
+constraints=self.constraints
+
+inputs={
+
+"work": self.work_data
+
+"brief": self.brief
+
+}
+
+)
+
+submit_for_consensus(decision)
+
+```
+
+### Step 4: Finalize Based on Consensus
+
+```python
+
+finalize(self, consensus_result):
+
+if consensus_result == "APPROVED":
+
+self.release_funds()
+
+self.refund_client()
+
+```
+
+### Whats happening here
+
+* You are not hardcoding approval logic.
+
+* Validators independently evaluate the inputs.
+
+* Consensus determines the outcome.
+
+* The result is explainable and challengeable.
+
+## 3. How Reasoning Actually Works
+
+Under the hood each validator does these things:
+
+1. Receives the inputs
+
+2. Runs the reasoning process
+
+3. Produces an output and explanation
+
+4. Submits their result
+
+Consensus is reached when enough validators agree.
+
+### Example Reasoning Output
+
+```json
+
+{
+
+"decision": ""
+
+"confidence": 0.87
+
+"reasoning": "The design matches the brief originality checks passed and delivery was within deadline."
+
+}
+
+```
+
+This output is:
+
+* Inspectable
+
+* Replayable
+
+* Challengeable
+
+## 4. Adding Real Data
+
+Autonomous Yield Agent
+
+Now lets move to an example.
+
+### Goal
+
+Maximize yield while staying within defined risk limits.
+
+### Step 1: Define the Agent
+
+```python
+
+class YieldAgent:
+
+goal = "Maximize yield over 30 days with risk"
+
+constraints = [
+
+"Max drawdown 5 percent"
+
+"pools"
+
+"liquidity threshold"
+
+]
+
+```
+
+### Step 2: Fetch Market Data
+
+```python
+
+get_market_data():
+
+return {
+
+": get_apy("Aave")
+
+"curve_usdc": get_apy("Curve")
+
+"compound_usdc": get_apy("Compound")
+
+}
+
+```
+
+### Step 3: Generate Strategies
+
+```python
+
+def generate_strategies(data):
+
+return [
+
+{"protocol": "Aave" "allocation": 1.0}
+
+{"protocol": "Curve" "allocation": 1.0}
+
+{"protocol": "Compound" "allocation": 1.0}
+
+]
+
+```
+
+### Step 4: Evaluate with Reasoning
+
+```python
+
+def evaluate(self):
+
+market_data = get_market_data()
+
+strategies = generate_strategies(market_data)
+
+decision = run_reasoning(
+
+goal=self.goal
+
+constraints=self.constraints
+
+inputs={
+
+"market": market_data
+
+"strategies": strategies
+
+}
+
+)
+
+submit_for_consensus(decision)
+
+```
+
+### Step 5: Execute Allocation
+
+```python
+
+def execute(self, approved_strategy):
+
+allocate_funds(approved_strategy)
+
+```
+
+### What makes this powerful
+
+* The Genlayer contract adapts to changing markets.
+
+* It does not rely on fixed thresholds.
+
+* It can justify why one strategy was chosen.
+
+## 5. Disputes and Verification
+
+This is where trust comes from.
+
+### Challenge Flow
+
+1. Decision is submitted
+
+2. A challenge window opens
+
+3. Validators rerun reasoning
+
+4. If disagreement occurs consensus resolves it
+
+### Example Dispute Trigger
+
+```python
+
+if decision.confidence < 0.6:
+
+flag_for_review()
+
+```
+
+### Key Rule
+
+Every decision must be reproducible from the inputs.
+
+If it cannot be replayed it should not be trusted.
+
+## 6. Testing Intelligent Contracts
+
+You are not just testing code. You are testing behavior.
+
+### What to Test
+
+**1. Conflicting Inputs**
+
+```python
+
+market_data = {
+
+"Aave": 5
+
+"Curve": 5
+
+"Compound": 20  # spike
+
+}
+
+```
+
+Does the agent blindly choose the yield or question it?
+
+**2. Missing Data**
+
+```python
+
+market_data = {}
+
+```
+
+Does the Genlayer contract fail safely?
+
+**3. Adversarial Inputs**
+
+* Fake data feeds
+
+* signals
+
+* Extreme edge cases
+
+### Simulation Pattern
+
+Run your Genlayer contract against:
+
+* Historical data
+
+* scenarios
+
+* Stress conditions
+
+This is critical before mainnet deployment.
+
+## 7. Shipping to Production
+
+### Add Guardrails
+
+* Max allocation per action
+
+* Rate limits on execution
+
+* Manual override for moves
+
+### Observability
+
+Log everything:
+
+* Inputs
+
+* Reasoning outputs
+
+* Decisions
+
+### Example Log Entry
+
+```json
+
+{
+
+"timestamp": "2026-04-06"
+
+"decision": "Allocate to Curve"
+
+"confidence": 0.82
+
+"inputs_used": ["apy" "liquidity" "risk score"]
+
+}
+
+```
+
+## 8. UX That Drives Adoption
+
+If users do not understand it they will not trust it.
+
+### Show Reasoning
+
+Show:
+
+* "Funds reallocated"
+
+* "We moved funds to Curve because it offered risk-adjusted yield based on liquidity and volatility."
+
+### Expose Confidence
+
+* High confidence decisions execute automatically
+
+* Low confidence decisions request confirmation
+
+### Let Users Replay Decisions
+
+Transparency builds trust faster than marketing.
+
+## 9. Scaling to Real Use Cases
+
+Once you understand the patterns you can build:
+
+### Insurance Contracts
+
+* Evaluate claims with ambiguity
+
+* Use real-world data
+
+* Resolve disputes via consensus
+
+### DAO Governance Agents
+
+* Summarize proposals
+
+* Check policy alignment
+
+* Recommend votes
+
+### Autonomous Treasuries
+
+* Allocate capital dynamically
+
+* Adjust risk exposure
+
+* React to market conditions
+
+## 10. What You Are Really Building
+
+You are not just building Genlayer contracts.
+
+You are building:
+
+* Systems that reason
+
+* Systems that explain themselves
+
+* Systems that can be challenged and improved
+
+That is the real shift Genlayer introduces.
